@@ -1,467 +1,450 @@
-document.addEventListener("DOMContentLoaded", () => {
+const state = {
+    filter: "all",
+    projects: [...projects],
+    currentIndex: 0
+};
 
-    const body = document.body;
+const projectStage = document.getElementById("projectsStage");
+const projectPosition = document.getElementById("projectPosition");
+const previousButton = document.getElementById("prevProject");
+const nextButton = document.getElementById("nextProject");
 
-    const themeToggle = document.getElementById("themeToggle");
+const projectDialog = document.getElementById("projectDialog");
+const dialogClose = document.getElementById("dialogClose");
+const dialogCloseSecondary = document.getElementById("dialogCloseSecondary");
 
-    const projectsStage = document.getElementById("projectsStage");
+const themeToggle = document.getElementById("themeToggle");
 
-    const previousProject = document.getElementById("previousProject");
-    const nextProject = document.getElementById("nextProject");
+function createIcons() {
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+}
 
-    const currentProject = document.getElementById("currentProject");
-    const totalProjects = document.getElementById("totalProjects");
-
-    const projectDialog = document.getElementById("projectDialog");
-
-    const dialogClose = document.getElementById("dialogClose");
-
-    const dialogIcon = document.getElementById("dialogIcon");
-    const dialogCategory = document.getElementById("dialogCategory");
-    const dialogTitle = document.getElementById("dialogTitle");
-    const dialogDescription = document.getElementById("dialogDescription");
-    const dialogLink = document.getElementById("dialogLink");
-
-    const filterButtons = document.querySelectorAll(".filter-button");
-
-
-    let currentFilter = "all";
-
-    let filteredProjects = [...projects];
-
-    let currentIndex = 0;
-
-
-    function initializeIcons() {
-        if (window.lucide) {
-            lucide.createIcons();
-        }
+function getFilteredProjects() {
+    if (state.filter === "all") {
+        return projects;
     }
 
+    return projects.filter(
+        project => project.filter === state.filter
+    );
+}
 
-    function updateThemeIcon() {
+function renderProjects() {
+    state.projects = getFilteredProjects();
 
-        const isLight = body.classList.contains("light");
+    if (state.projects.length === 0) {
+        projectStage.innerHTML = `
+            <div class="empty-projects">
+                No hay proyectos en esta categoría.
+            </div>
+        `;
 
-        themeToggle.innerHTML = isLight
-            ? '<i data-lucide="moon"></i>'
-            : '<i data-lucide="sun"></i>';
-
-        themeToggle.setAttribute(
-            "aria-label",
-            isLight
-                ? "Cambiar a modo oscuro"
-                : "Cambiar a modo claro"
-        );
-
-        initializeIcons();
+        projectPosition.textContent = "0 / 0";
+        return;
     }
 
-
-    function loadTheme() {
-
-        const savedTheme = localStorage.getItem("portfolio-theme");
-
-        if (savedTheme === "light") {
-            body.classList.add("light");
-        } else {
-            body.classList.remove("light");
-        }
-
-        updateThemeIcon();
+    if (state.currentIndex >= state.projects.length) {
+        state.currentIndex = 0;
     }
 
+    projectStage.innerHTML = state.projects
+        .map((project, index) => {
 
-    themeToggle.addEventListener("click", () => {
+            const number = String(index + 1).padStart(2, "0");
 
-        body.classList.toggle("light");
+            return `
+                <article
+                    class="project-card ${index === state.currentIndex ? "active" : ""}"
+                    data-index="${index}"
+                    style="--offset: 0; --scale: 1;"
+                >
 
-        const isLight = body.classList.contains("light");
-
-        localStorage.setItem(
-            "portfolio-theme",
-            isLight ? "light" : "dark"
-        );
-
-        updateThemeIcon();
-    });
-
-
-    function getFilteredProjects() {
-
-        if (currentFilter === "all") {
-            return [...projects];
-        }
-
-        return projects.filter(
-            project => project.filter === currentFilter
-        );
-    }
-
-
-    function renderProjects() {
-
-        filteredProjects = getFilteredProjects();
-
-        if (filteredProjects.length === 0) {
-
-            projectsStage.innerHTML = `
-                <div class="empty-projects">
-                    No hay proyectos en esta categoría.
-                </div>
-            `;
-
-            currentProject.textContent = "00";
-            totalProjects.textContent = "00";
-
-            return;
-        }
-
-
-        if (currentIndex >= filteredProjects.length) {
-            currentIndex = 0;
-        }
-
-
-        projectsStage.innerHTML = "";
-
-
-        filteredProjects.forEach((project, index) => {
-
-            const card = document.createElement("article");
-
-            card.className = "project-card";
-
-            card.dataset.index = index;
-            card.dataset.project = project.id;
-
-            const rotation =
-                index === currentIndex
-                    ? 0
-                    : index % 2 === 0
-                        ? -4
-                        : 4;
-
-            card.style.setProperty(
-                "--rotation",
-                `${rotation}deg`
-            );
-
-
-            const isActive = index === currentIndex;
-
-            card.style.opacity = isActive ? "1" : "0";
-
-            card.style.pointerEvents = isActive
-                ? "auto"
-                : "none";
-
-
-            card.innerHTML = `
-                <div class="card-top">
-
-                    <span class="card-number">
-                        ${String(index + 1).padStart(2, "0")}
-                    </span>
+                    <div class="card-number">
+                        <span>${number}</span>
+                        <span>PROJECT</span>
+                    </div>
 
                     <div class="card-icon">
                         <i data-lucide="${project.icon}"></i>
                     </div>
 
-                </div>
+                    <div class="card-content">
 
+                        <p class="card-category">
+                            ${project.category}
+                        </p>
 
-                <div class="card-category">
-                    ${project.category}
-                </div>
+                        <h3 class="card-title">
+                            ${project.title}
+                        </h3>
 
+                        <p class="card-description">
+                            ${project.description}
+                        </p>
 
-                <h3>
-                    ${project.title}
-                </h3>
+                        <a
+                            class="project-open"
+                            href="${project.link}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Abrir proyecto
+                            <i data-lucide="arrow-up-right"></i>
+                        </a>
 
+                    </div>
 
-                <p class="card-description">
-                    ${project.description}
-                </p>
-
-
-                <div class="card-actions">
-
-                    <a
-                        href="${project.link}"
-                        class="open-project"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Abrir proyecto
-                        <i data-lucide="external-link"></i>
-                    </a>
-
-                </div>
+                </article>
             `;
+        })
+        .join("");
 
+    updateProjectCards();
+    createIcons();
+}
 
-            projectsStage.appendChild(card);
+function updateProjectCards() {
+    const cards = [
+        ...projectStage.querySelectorAll(".project-card")
+    ];
 
-        });
+    const total = state.projects.length;
 
+    cards.forEach((card, index) => {
 
-        updateProjectPosition();
+        let offset = index - state.currentIndex;
 
-        initializeIcons();
-
-        animateCards();
-    }
-
-
-    function animateCards() {
-
-        const cards =
-            document.querySelectorAll(".project-card");
-
-
-        cards.forEach((card, index) => {
-
-            const distance =
-                index - currentIndex;
-
-            if (distance === 0) {
-
-                card.style.opacity = "1";
-                card.style.pointerEvents = "auto";
-                card.style.zIndex = "10";
-
-                card.style.transform =
-                    "translate(-50%, -50%) rotate(0deg)";
-
-            } else {
-
-                card.style.opacity = "0";
-                card.style.pointerEvents = "none";
-                card.style.zIndex = "1";
-
-            }
-
-        });
-
-    }
-
-
-    function updateProjectPosition() {
-
-        const total = filteredProjects.length;
-
-        if (total === 0) {
-            return;
+        if (offset > total / 2) {
+            offset -= total;
         }
 
-        currentProject.textContent =
-            String(currentIndex + 1).padStart(2, "0");
-
-        totalProjects.textContent =
-            String(total).padStart(2, "0");
-    }
-
-
-    function openProjectDialog(project) {
-
-        dialogCategory.textContent =
-            project.category;
-
-        dialogTitle.textContent =
-            project.title;
-
-        dialogDescription.textContent =
-            project.description;
-
-        dialogLink.href =
-            project.link;
-
-        dialogIcon.innerHTML = `
-            <i data-lucide="${project.icon}"></i>
-        `;
-
-        initializeIcons();
-
-
-        if (typeof projectDialog.showModal === "function") {
-            projectDialog.showModal();
-        }
-    }
-
-
-    function closeProjectDialog() {
-
-        if (projectDialog.open) {
-            projectDialog.close();
+        if (offset < -total / 2) {
+            offset += total;
         }
 
-    }
+        const absoluteOffset = Math.abs(offset);
 
+        let scale = 1 - Math.min(absoluteOffset * 0.07, 0.21);
 
-    previousProject.addEventListener("click", () => {
-
-        if (filteredProjects.length === 0) {
-            return;
+        if (offset === 0) {
+            scale = 1;
         }
 
-        currentIndex--;
+        card.style.setProperty("--offset", offset);
+        card.style.setProperty("--scale", scale);
 
-        if (currentIndex < 0) {
-            currentIndex =
-                filteredProjects.length - 1;
+        card.classList.toggle(
+            "active",
+            offset === 0
+        );
+
+        if (absoluteOffset > 2) {
+            card.style.opacity = "0";
+            card.style.pointerEvents = "none";
+        } else {
+            card.style.opacity =
+                offset === 0 ? "1" : "0.58";
+
+            card.style.pointerEvents =
+                offset === 0 ? "auto" : "auto";
         }
 
-        renderProjects();
-
+        card.style.zIndex =
+            String(100 - absoluteOffset);
     });
 
+    projectPosition.textContent =
+        `${state.currentIndex + 1} / ${total}`;
+}
 
-    nextProject.addEventListener("click", () => {
+function nextProject() {
+    if (!state.projects.length) {
+        return;
+    }
 
-        if (filteredProjects.length === 0) {
-            return;
-        }
+    state.currentIndex =
+        (state.currentIndex + 1) %
+        state.projects.length;
 
-        currentIndex++;
+    updateProjectCards();
+    createIcons();
+}
 
-        if (currentIndex >= filteredProjects.length) {
-            currentIndex = 0;
-        }
+function previousProject() {
+    if (!state.projects.length) {
+        return;
+    }
 
-        renderProjects();
+    state.currentIndex =
+        (state.currentIndex - 1 + state.projects.length) %
+        state.projects.length;
 
-    });
+    updateProjectCards();
+    createIcons();
+}
 
+function openProject(project) {
 
-    filterButtons.forEach(button => {
+    const dialogIcon =
+        document.getElementById("dialogIcon");
 
-        button.addEventListener("click", () => {
+    const dialogCategory =
+        document.getElementById("dialogCategory");
 
-            filterButtons.forEach(item => {
-                item.classList.remove("active");
-            });
+    const dialogTitle =
+        document.getElementById("dialogTitle");
 
-            button.classList.add("active");
+    const dialogDescription =
+        document.getElementById("dialogDescription");
 
-            currentFilter =
-                button.dataset.filter;
+    const dialogLink =
+        document.getElementById("dialogLink");
 
-            currentIndex = 0;
-
-            renderProjects();
-
-        });
-
-    });
-
-
-    projectsStage.addEventListener("click", event => {
-
-        const card =
-            event.target.closest(".project-card");
-
-        if (!card) {
-            return;
-        }
-
-
-        const link =
-            event.target.closest(".open-project");
-
-
-        if (link) {
-            return;
-        }
-
-
-        const project =
-            filteredProjects[
-            Number(card.dataset.index)
-            ];
-
-
-        if (project) {
-            openProjectDialog(project);
-        }
-
-    });
-
-
-    dialogClose.addEventListener(
-        "click",
-        closeProjectDialog
+    dialogIcon.setAttribute(
+        "data-lucide",
+        project.icon
     );
 
+    dialogCategory.textContent =
+        project.category;
 
-    projectDialog.addEventListener(
-        "click",
-        event => {
+    dialogTitle.textContent =
+        project.title;
 
-            if (event.target === projectDialog) {
-                closeProjectDialog();
-            }
+    dialogDescription.textContent =
+        project.description;
 
-        }
-    );
+    dialogLink.href =
+        project.link;
 
+    dialogLink.target =
+        "_blank";
 
-    document.addEventListener(
-        "keydown",
-        event => {
+    dialogLink.rel =
+        "noopener noreferrer";
 
-            if (event.key === "Escape") {
-                closeProjectDialog();
-            }
+    if (
+        projectDialog &&
+        typeof projectDialog.showModal === "function"
+    ) {
+        projectDialog.showModal();
+    } else {
+        projectDialog.setAttribute(
+            "open",
+            ""
+        );
+    }
 
-        }
-    );
+    createIcons();
+}
 
+function closeProject() {
+    if (
+        projectDialog &&
+        typeof projectDialog.close === "function" &&
+        projectDialog.open
+    ) {
+        projectDialog.close();
+    } else if (projectDialog) {
+        projectDialog.removeAttribute("open");
+    }
+}
 
-    document.querySelectorAll(
-        'a[href^="#"]'
-    ).forEach(link => {
+projectStage.addEventListener("click", event => {
 
-        link.addEventListener("click", event => {
+    const projectLink =
+        event.target.closest(".project-open");
 
-            const targetId =
-                link.getAttribute("href");
+    if (projectLink) {
+        return;
+    }
 
-            if (
-                !targetId ||
-                targetId === "#"
-            ) {
-                return;
-            }
+    const card =
+        event.target.closest(".project-card");
 
+    if (!card) {
+        return;
+    }
 
-            const target =
-                document.querySelector(targetId);
+    const index =
+        Number(card.dataset.index);
 
+    if (
+        index !== state.currentIndex
+    ) {
+        state.currentIndex = index;
+        updateProjectCards();
+        return;
+    }
 
-            if (!target) {
-                return;
-            }
+    const project =
+        state.projects[index];
 
-
-            event.preventDefault();
-
-
-            target.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-
-        });
-
-    });
-
-
-    loadTheme();
-
-    renderProjects();
-
-    initializeIcons();
-
+    if (project) {
+        openProject(project);
+    }
 });
+
+previousButton.addEventListener(
+    "click",
+    previousProject
+);
+
+nextButton.addEventListener(
+    "click",
+    nextProject
+);
+
+document
+    .querySelectorAll(".filter-button")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                document
+                    .querySelectorAll(".filter-button")
+                    .forEach(item => {
+                        item.classList.remove("active");
+                    });
+
+                button.classList.add("active");
+
+                state.filter =
+                    button.dataset.filter;
+
+                state.currentIndex = 0;
+
+                renderProjects();
+            }
+        );
+    });
+
+dialogClose.addEventListener(
+    "click",
+    closeProject
+);
+
+dialogCloseSecondary.addEventListener(
+    "click",
+    closeProject
+);
+
+projectDialog.addEventListener(
+    "click",
+    event => {
+
+        const rect =
+            projectDialog.getBoundingClientRect();
+
+        const clickedOutside =
+            event.clientX < rect.left ||
+            event.clientX > rect.right ||
+            event.clientY < rect.top ||
+            event.clientY > rect.bottom;
+
+        if (clickedOutside) {
+            closeProject();
+        }
+    }
+);
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (event.key === "Escape") {
+            closeProject();
+        }
+
+        if (
+            event.key === "ArrowRight" &&
+            !projectDialog.open
+        ) {
+            nextProject();
+        }
+
+        if (
+            event.key === "ArrowLeft" &&
+            !projectDialog.open
+        ) {
+            previousProject();
+        }
+    }
+);
+
+function setTheme(theme) {
+
+    const isLight =
+        theme === "light";
+
+    document.body.classList.toggle(
+        "light-mode",
+        isLight
+    );
+
+    themeToggle.setAttribute(
+        "aria-pressed",
+        String(isLight)
+    );
+
+    themeToggle.innerHTML = isLight
+        ? `<i data-lucide="sun"></i>`
+        : `<i data-lucide="moon"></i>`;
+
+    localStorage.setItem(
+        "portfolio-theme",
+        theme
+    );
+
+    createIcons();
+}
+
+function initializeTheme() {
+
+    const savedTheme =
+        localStorage.getItem(
+            "portfolio-theme"
+        );
+
+    if (savedTheme) {
+        setTheme(savedTheme);
+        return;
+    }
+
+    const prefersLight =
+        window.matchMedia &&
+        window.matchMedia(
+            "(prefers-color-scheme: light)"
+        ).matches;
+
+    setTheme(
+        prefersLight
+            ? "light"
+            : "dark"
+    );
+}
+
+themeToggle.addEventListener(
+    "click",
+    () => {
+
+        const isLight =
+            document.body.classList.contains(
+                "light-mode"
+            );
+
+        setTheme(
+            isLight
+                ? "dark"
+                : "light"
+        );
+    }
+);
+
+renderProjects();
+initializeTheme();
+createIcons();

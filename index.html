@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Portafolio de Andrés David, desarrollador web.">
+    <meta name="author" content="Andrés David">
+
+    <title>Andrés David | Portafolio</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="cursor-glow"></div>
+
+    <header class="site-header">
+
+        <a href="#home" class="brand">
+            <span class="brand-mark">AD</span>
+
+            <span class="brand-text">
+                ANDRÉS DAVID
+            </span>
+        </a>
+
+        <nav class="nav-links" id="mainNav">
+
+            <a href="#home" class="active">
+                Inicio
+            </a>
+
+            <a href="#projects">
+                Proyectos
+            </a>
+
+            <a href="#about">
+                Sobre mí
+            </a>
+
+            <a href="#contact">
+                Contacto
+            </a>
+
+        </nav>
+
+        <div class="header-actions">
+
+            <button class="theme-toggle" id="themeToggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">
+                <i data-lucide="sun"></i>
+            </button>
+
+            <a href="#contact" class="header-contact">
+                Contactar
+                <i data-lucide="arrow-up-right"></i>
+            </a>
+
+            <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menú">
+                <i data-lucide="menu"></i>
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <section class="hero" id="home">
+
+            <div class="hero-grid"></div>
+
+            <div class="hero-copy reveal">
+
+                <p class="eyebrow">
+                    DESARROLLADOR · CREADOR · APRENDIZ
+                </p>
+
+                <h1>
+                    Creo
+                    <span>experiencias</span>
+                    digitales.
+                </h1>
+
+                <p class="hero-description">
+                    Desarrollo aplicaciones web, herramientas interactivas
+                    y proyectos personales combinando diseño, código,
+                    creatividad y muchas horas de curiosidad.
+                </p>
+
+                <div class="hero-actions">
+
+                    <a href="#projects" class="hero-button primary">
+                        Ver proyectos
+                        <i data-lucide="arrow-down"></i>
+                    </a>
+
+                    <a href="#about" class="hero-button secondary">
+                        Conocerme
+                        <i data-lucide="user"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="vinyl-art" aria-label="La música es una de las pasiones de Andrés">
+
+                <div class="vinyl-wave"></div>
+                <div class="vinyl-wave"></div>
+                <div class="vinyl-wave"></div>
+
+                <div class="vinyl-disc">
+
+                    <div class="vinyl-reflection"></div>
+
+                    <div class="vinyl-label">
+                        <strong>♪</strong>
+                        <span>ANDRÉS · MUSIC</span>
+                    </div>
+
+                </div>
+
+                <div class="vinyl-note one">♪</div>
+                <div class="vinyl-note two">♫</div>
+
+                <div class="vinyl-code-pill">
+                    CODE / MUSIC
+                </div>
+
+                <div class="vinyl-chip">
+                    SOUNDTRACK
+                </div>
+
+            </div>
+
+            <div class="hero-scroll">
+                <span>SCROLL</span>
+                <i data-lucide="arrow-down"></i>
+            </div>
+
+        </section>
+
+
+        <section class="ticker">
+
+            <div class="ticker-track">
+
+                <span>HTML</span>
+                <span>✦</span>
+                <span>CSS</span>
+                <span>✦</span>
+                <span>JAVASCRIPT</span>
+                <span>✦</span>
+                <span>PYTHON</span>
+                <span>✦</span>
+                <span>REACT</span>
+                <span>✦</span>
+                <span>TAILWIND</span>
+                <span>✦</span>
+                <span>API</span>
+                <span>✦</span>
+                <span>CREATIVITY</span>
+                <span>✦</span>
+
+                <span>HTML</span>
+                <span>✦</span>
+                <span>CSS</span>
+                <span>✦</span>
+                <span>JAVASCRIPT</span>
+                <span>✦</span>
+                <span>PYTHON</span>
+                <span>✦</span>
+                <span>REACT</span>
+                <span>✦</span>
+                <span>TAILWIND</span>
+                <span>✦</span>
+                <span>API</span>
+                <span>✦</span>
+                <span>CREATIVITY</span>
+                <span>✦</span>
+
+            </div>
+
+        </section>
+
+
+        <section class="projects-section" id="projects">
+
+            <div class="section-heading reveal">
+
+                <div>
+                    <p class="section-kicker">
+                        01 / PROYECTOS
+                    </p>
+
+                    <h2>
+                        Cosas que
+                        <span>he construido.</span>
+                    </h2>
+                </div>
+
+                <p>
+                    Una colección de aplicaciones, herramientas,
+                    experimentos y proyectos personales.
+                </p>
+
+            </div>
+
+
+            <div class="project-filters" id="projectFilters">
+
+                <button class="filter-button active" type="button" data-filter="all">
+                    Todos
+                </button>
+
+                <button class="filter-button" type="button" data-filter="web">
+                    Web
+                </button>
+
+                <button class="filter-button" type="button" data-filter="education">
+                    Educación
+                </button>
+
+                <button class="filter-button" type="button" data-filter="tools">
+                    Herramientas
+                </button>
+
+                <button class="filter-button" type="button" data-filter="creative">
+                    Creativo
+                </button>
+
+            </div>
+
+
+            <div class="projects-stage" id="projectsStage"></div>
+
+
+            <div class="project-navigation">
+
+                <button class="carousel-control" id="previousProject" type="button" aria-label="Proyecto anterior">
+                    <i data-lucide="arrow-left"></i>
+                </button>
+
+                <div class="project-position" id="projectPosition">
+                    01 / 18
+                </div>
+
+                <button class="carousel-control" id="nextProject" type="button" aria-label="Siguiente proyecto">
+                    <i data-lucide="arrow-right"></i>
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <section class="about-section" id="about">
+
+            <div class="section-heading reveal">
+
+                <div>
+                    <p class="section-kicker">
+                        02 / SOBRE MÍ
+                    </p>
+
+                    <h2>
+                        Código,
+                        <span>curiosidad</span>
+                        y música.
+                    </h2>
+                </div>
+
+            </div>
+
+
+            <div class="about-grid">
+
+                <div class="profile-card reveal">
+
+                    <div class="profile-image-wrap">
+
+                        <img src="images\WhatsApp Image 2026-09-27 at 7.53.18 PM.jpeg"
+                            alt="Foto de perfil de Andrés David" class="profile-image">
+
+                        <div class="profile-overlay"></div>
+
+                        <div class="profile-corner">
+                            <i data-lucide="plus"></i>
+                        </div>
+
+                    </div>
+
+                    <div class="profile-caption">
+                        <span>ANDRÉS DAVID</span>
+                        <small>WEB DEVELOPER</small>
+                    </div>
+
+                </div>
+
+
+                <div class="about-content reveal">
+
+                    <p class="about-role">
+                        DESARROLLADOR WEB
+                        <span>✦</span>
+                        APRENDIZ CONSTANTE
+                    </p>
+
+                    <h3 class="about-name">
+                        Andrés
+                        <span>David.</span>
+                    </h3>
+
+                    <div class="about-text">
+
+                        <p>
+                            Siempre estoy buscando algo nuevo que aprender,
+                            construir y convertir en una experiencia digital.
+                        </p>
+
+                        <p>
+                            Manejo tecnologías como HTML, CSS, JavaScript,
+                            Python, React y Tailwind CSS. Me gusta experimentar
+                            con nuevas herramientas, crear proyectos propios
+                            y seguir ampliando mis conocimientos.
+                        </p>
+
+                        <p>
+                            Nunca me canso de aprender, porque siempre hay
+                            algo nuevo que construir.
+                        </p>
+
+                    </div>
+
+
+                    <div class="skill-list">
+
+                        <span>HTML</span>
+                        <span>CSS</span>
+                        <span>JAVASCRIPT</span>
+                        <span>PYTHON</span>
+                        <span>REACT</span>
+                        <span>TAILWIND CSS</span>
+                        <span>API</span>
+                        <span>JSON</span>
+                        <span>GITHUB</span>
+                        <span>NETLIFY</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="contact-section" id="contact">
+
+            <div class="contact-panel reveal">
+
+                <div class="contact-decoration">
+                    ♪
+                </div>
+
+                <p class="section-kicker">
+                    03 / CONTACTO
+                </p>
+
+                <h2>
+                    Hagamos algo
+                    <span>interesante.</span>
+                </h2>
+
+                <p class="contact-intro">
+                    Si quieres conocer mis proyectos, colaborar
+                    o simplemente encontrarme en internet,
+                    aquí están mis redes.
+                </p>
+
+
+                <div class="contact-links">
+
+                    <a class="contact-link" href="https://github.com/DREW2108" target="_blank" rel="noopener noreferrer"
+                        aria-label="GitHub" title="GitHub">
+                        <i data-lucide="github"></i>
+                        <span>GITHUB</span>
+                    </a>
+
+
+                    <a class="contact-link" href="#" aria-label="LinkedIn" title="LinkedIn">
+                        <i data-lucide="linkedin"></i>
+                        <span>LINKEDIN</span>
+                    </a>
+
+
+                    <a class="contact-link" href="#" aria-label="Instagram" title="Instagram">
+                        <i data-lucide="instagram"></i>
+                        <span>INSTAGRAM</span>
+                    </a>
+
+
+                    <a class="contact-link" href="mailto:" aria-label="Correo electrónico" title="Correo electrónico">
+                        <i data-lucide="mail"></i>
+                        <span>EMAIL</span>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer class="site-footer">
+
+        <span>
+            © 2026 Andrés David
+        </span>
+
+        <span>
+            Hecho con código, música y demasiada curiosidad.
+        </span>
+
+        <a href="#home">
+            VOLVER ARRIBA
+            <i data-lucide="arrow-up"></i>
+        </a>
+
+    </footer>
+
+
+    <dialog id="projectDialog">
+
+        <div class="dialog-shell">
+
+            <button class="dialog-close" id="dialogClose" type="button" aria-label="Cerrar">
+                <i data-lucide="x"></i>
+            </button>
+
+
+            <div class="dialog-visual">
+
+                <div class="dialog-icon">
+                    <i data-lucide="sparkles"></i>
+                </div>
+
+                <div class="dialog-number">
+                    PROJECT
+                </div>
+
+            </div>
+
+
+            <div class="dialog-content">
+
+                <p class="dialog-category" id="dialogCategory">
+                    WEB / APP
+                </p>
+
+                <h2 id="dialogTitle">
+                    Proyecto
+                </h2>
+
+                <p id="dialogDescription">
+                    Descripción del proyecto.
+                </p>
+
+                <a id="dialogLink" class="project-open" href="#" target="_blank" rel="noopener noreferrer">
+                    Abrir proyecto
+                    <i data-lucide="arrow-up-right"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+    </dialog>
+
+
+    <script src="projects.js"></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>

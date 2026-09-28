@@ -1,331 +1,270 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    let currentProjects = [...projects];
-    let currentIndex = 0;
+    const body = document.body;
 
-    const stage = document.getElementById("projectsStage");
-    const filters = document.querySelectorAll(".filter-button");
+    const themeToggle = document.getElementById("themeToggle");
 
-    const previousButton = document.getElementById("previousProject");
-    const nextButton = document.getElementById("nextProject");
-    const positionElement = document.getElementById("projectPosition");
+    const projectsStage = document.getElementById("projectsStage");
 
-    const dialog = document.getElementById("projectDialog");
+    const previousProject = document.getElementById("previousProject");
+    const nextProject = document.getElementById("nextProject");
+
+    const currentProject = document.getElementById("currentProject");
+    const totalProjects = document.getElementById("totalProjects");
+
+    const projectDialog = document.getElementById("projectDialog");
+
     const dialogClose = document.getElementById("dialogClose");
 
+    const dialogIcon = document.getElementById("dialogIcon");
     const dialogCategory = document.getElementById("dialogCategory");
     const dialogTitle = document.getElementById("dialogTitle");
     const dialogDescription = document.getElementById("dialogDescription");
     const dialogLink = document.getElementById("dialogLink");
 
-    const themeToggle = document.getElementById("themeToggle");
-
-    const menuToggle = document.getElementById("menuToggle");
-    const mainNav = document.getElementById("mainNav");
+    const filterButtons = document.querySelectorAll(".filter-button");
 
 
-    function createProjectCard(project, index) {
+    let currentFilter = "all";
 
-        const article = document.createElement("article");
+    let filteredProjects = [...projects];
 
-        article.className = "project-card";
-
-        article.dataset.projectId = project.id;
-        article.dataset.index = index;
-
-        article.innerHTML = `
-
-            <div class="project-card-inner">
-
-                <div class="project-card-face project-card-front">
-
-                    <div class="project-visual">
-
-                        <div class="project-number">
-                            ${String(index + 1).padStart(2, "0")}
-                        </div>
-
-                        <div class="project-icon">
-                            <i data-lucide="${project.icon}"></i>
-                        </div>
-
-                        <div class="project-orbit orbit-one"></div>
-                        <div class="project-orbit orbit-two"></div>
-
-                        <span class="project-mini-label">
-                            ${project.category}
-                        </span>
-
-                    </div>
+    let currentIndex = 0;
 
 
-                    <div class="project-info">
-
-                        <div>
-
-                            <p>
-                                ${project.category}
-                            </p>
-
-                            <h3>
-                                ${project.title}
-                            </h3>
-
-                        </div>
-
-                        <span class="project-arrow">
-                            <i data-lucide="arrow-up-right"></i>
-                        </span>
-
-                    </div>
-
-                </div>
+    function initializeIcons() {
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    }
 
 
-                <div class="project-card-face project-card-back">
+    function updateThemeIcon() {
 
-                    <div class="back-content">
+        const isLight = body.classList.contains("light");
 
-                        <p class="back-label">
-                            ${project.category}
-                        </p>
+        themeToggle.innerHTML = isLight
+            ? '<i data-lucide="moon"></i>'
+            : '<i data-lucide="sun"></i>';
 
-                        <h3>
-                            ${project.title}
-                        </h3>
+        themeToggle.setAttribute(
+            "aria-label",
+            isLight
+                ? "Cambiar a modo oscuro"
+                : "Cambiar a modo claro"
+        );
 
-                        <p>
-                            ${project.description}
-                        </p>
+        initializeIcons();
+    }
 
-                        <button
-                            class="project-open"
-                            type="button"
-                            data-project-open="${project.id}"
-                        >
-                            Abrir proyecto
-                            <i data-lucide="arrow-up-right"></i>
-                        </button>
 
-                    </div>
+    function loadTheme() {
 
-                </div>
+        const savedTheme = localStorage.getItem("portfolio-theme");
 
-            </div>
-        `;
+        if (savedTheme === "light") {
+            body.classList.add("light");
+        } else {
+            body.classList.remove("light");
+        }
 
-        return article;
+        updateThemeIcon();
+    }
+
+
+    themeToggle.addEventListener("click", () => {
+
+        body.classList.toggle("light");
+
+        const isLight = body.classList.contains("light");
+
+        localStorage.setItem(
+            "portfolio-theme",
+            isLight ? "light" : "dark"
+        );
+
+        updateThemeIcon();
+    });
+
+
+    function getFilteredProjects() {
+
+        if (currentFilter === "all") {
+            return [...projects];
+        }
+
+        return projects.filter(
+            project => project.filter === currentFilter
+        );
     }
 
 
     function renderProjects() {
 
-        if (!stage) return;
+        filteredProjects = getFilteredProjects();
 
-        stage.innerHTML = "";
+        if (filteredProjects.length === 0) {
 
-        if (!currentProjects.length) {
-
-            stage.innerHTML = `
+            projectsStage.innerHTML = `
                 <div class="empty-projects">
-                    <i data-lucide="folder-open"></i>
-                    <h3>No hay proyectos</h3>
-                    <p>
-                        No hay proyectos dentro de esta categoría.
-                    </p>
+                    No hay proyectos en esta categoría.
                 </div>
             `;
 
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-
-            updatePosition();
+            currentProject.textContent = "00";
+            totalProjects.textContent = "00";
 
             return;
         }
 
-        currentIndex = Math.min(
-            currentIndex,
-            currentProjects.length - 1
-        );
 
-        currentProjects.forEach((project, index) => {
+        if (currentIndex >= filteredProjects.length) {
+            currentIndex = 0;
+        }
 
-            const card = createProjectCard(project, index);
 
-            stage.appendChild(card);
+        projectsStage.innerHTML = "";
+
+
+        filteredProjects.forEach((project, index) => {
+
+            const card = document.createElement("article");
+
+            card.className = "project-card";
+
+            card.dataset.index = index;
+            card.dataset.project = project.id;
+
+            const rotation =
+                index === currentIndex
+                    ? 0
+                    : index % 2 === 0
+                        ? -4
+                        : 4;
+
+            card.style.setProperty(
+                "--rotation",
+                `${rotation}deg`
+            );
+
+
+            const isActive = index === currentIndex;
+
+            card.style.opacity = isActive ? "1" : "0";
+
+            card.style.pointerEvents = isActive
+                ? "auto"
+                : "none";
+
+
+            card.innerHTML = `
+                <div class="card-top">
+
+                    <span class="card-number">
+                        ${String(index + 1).padStart(2, "0")}
+                    </span>
+
+                    <div class="card-icon">
+                        <i data-lucide="${project.icon}"></i>
+                    </div>
+
+                </div>
+
+
+                <div class="card-category">
+                    ${project.category}
+                </div>
+
+
+                <h3>
+                    ${project.title}
+                </h3>
+
+
+                <p class="card-description">
+                    ${project.description}
+                </p>
+
+
+                <div class="card-actions">
+
+                    <a
+                        href="${project.link}"
+                        class="open-project"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Abrir proyecto
+                        <i data-lucide="external-link"></i>
+                    </a>
+
+                </div>
+            `;
+
+
+            projectsStage.appendChild(card);
 
         });
 
-        updateCards();
 
-        if (window.lucide) {
-            lucide.createIcons();
-        }
+        updateProjectPosition();
 
-        addCardEvents();
+        initializeIcons();
+
+        animateCards();
     }
 
 
-    function updateCards() {
+    function animateCards() {
 
-        const cards = stage.querySelectorAll(".project-card");
+        const cards =
+            document.querySelectorAll(".project-card");
+
 
         cards.forEach((card, index) => {
 
-            card.classList.remove(
-                "is-active",
-                "is-left",
-                "is-right",
-                "is-hidden"
-            );
+            const distance =
+                index - currentIndex;
 
-            if (index === currentIndex) {
+            if (distance === 0) {
 
-                card.classList.add("is-active");
+                card.style.opacity = "1";
+                card.style.pointerEvents = "auto";
+                card.style.zIndex = "10";
 
-            } else if (index === getPreviousIndex()) {
-
-                card.classList.add("is-left");
-
-            } else if (index === getNextIndex()) {
-
-                card.classList.add("is-right");
+                card.style.transform =
+                    "translate(-50%, -50%) rotate(0deg)";
 
             } else {
 
-                card.classList.add("is-hidden");
+                card.style.opacity = "0";
+                card.style.pointerEvents = "none";
+                card.style.zIndex = "1";
 
             }
 
         });
 
-        updatePosition();
     }
 
 
-    function getPreviousIndex() {
+    function updateProjectPosition() {
 
-        if (!currentProjects.length) {
-            return -1;
-        }
+        const total = filteredProjects.length;
 
-        return (
-            currentIndex - 1 + currentProjects.length
-        ) % currentProjects.length;
-    }
-
-
-    function getNextIndex() {
-
-        if (!currentProjects.length) {
-            return -1;
-        }
-
-        return (
-            currentIndex + 1
-        ) % currentProjects.length;
-    }
-
-
-    function updatePosition() {
-
-        if (!positionElement) return;
-
-        if (!currentProjects.length) {
-
-            positionElement.textContent = "00 / 00";
-
+        if (total === 0) {
             return;
         }
 
-        positionElement.textContent =
-            `${String(currentIndex + 1).padStart(2, "0")} / ${String(currentProjects.length).padStart(2, "0")}`;
+        currentProject.textContent =
+            String(currentIndex + 1).padStart(2, "0");
+
+        totalProjects.textContent =
+            String(total).padStart(2, "0");
     }
 
 
-    function goToProject(index) {
-
-        if (!currentProjects.length) {
-            return;
-        }
-
-        if (index < 0) {
-            index = currentProjects.length - 1;
-        }
-
-        if (index >= currentProjects.length) {
-            index = 0;
-        }
-
-        currentIndex = index;
-
-        updateCards();
-    }
-
-
-    function addCardEvents() {
-
-        const cards = stage.querySelectorAll(".project-card");
-
-        cards.forEach((card, index) => {
-
-            card.addEventListener("click", event => {
-
-                const openButton =
-                    event.target.closest("[data-project-open]");
-
-                if (openButton) {
-                    return;
-                }
-
-                if (index !== currentIndex) {
-
-                    currentIndex = index;
-
-                    updateCards();
-
-                    return;
-                }
-
-                card.classList.toggle("is-flipped");
-
-            });
-
-        });
-
-
-        const openButtons =
-            stage.querySelectorAll("[data-project-open]");
-
-        openButtons.forEach(button => {
-
-            button.addEventListener("click", event => {
-
-                event.stopPropagation();
-
-                const projectId =
-                    button.dataset.projectOpen;
-
-                openProject(projectId);
-
-            });
-
-        });
-
-    }
-
-
-    function openProject(projectId) {
-
-        const project = projects.find(
-            item => item.id === projectId
-        );
-
-        if (!project) {
-            return;
-        }
+    function openProjectDialog(project) {
 
         dialogCategory.textContent =
             project.category;
@@ -337,93 +276,77 @@ document.addEventListener("DOMContentLoaded", () => {
             project.description;
 
         dialogLink.href =
-            project.link || "#";
+            project.link;
 
-        dialogLink.hidden =
-            !project.link;
+        dialogIcon.innerHTML = `
+            <i data-lucide="${project.icon}"></i>
+        `;
 
-        dialogLink.target =
-            "_blank";
-
-        dialogLink.rel =
-            "noopener noreferrer";
+        initializeIcons();
 
 
-        const iconContainer =
-            document.querySelector(".dialog-icon");
-
-        if (iconContainer) {
-
-            iconContainer.innerHTML = `
-                <i data-lucide="${project.icon}"></i>
-            `;
-
+        if (typeof projectDialog.showModal === "function") {
+            projectDialog.showModal();
         }
+    }
 
 
-        if (window.lucide) {
-            lucide.createIcons();
-        }
+    function closeProjectDialog() {
 
-
-        if (typeof dialog.showModal === "function") {
-
-            dialog.showModal();
-
-        } else {
-
-            dialog.setAttribute("open", "");
-
+        if (projectDialog.open) {
+            projectDialog.close();
         }
 
     }
 
 
-    function closeDialog() {
+    previousProject.addEventListener("click", () => {
 
-        if (!dialog) {
+        if (filteredProjects.length === 0) {
             return;
         }
 
-        if (typeof dialog.close === "function") {
+        currentIndex--;
 
-            dialog.close();
-
-        } else {
-
-            dialog.removeAttribute("open");
-
+        if (currentIndex < 0) {
+            currentIndex =
+                filteredProjects.length - 1;
         }
 
-    }
+        renderProjects();
+
+    });
 
 
-    filters.forEach(filterButton => {
+    nextProject.addEventListener("click", () => {
 
-        filterButton.addEventListener("click", () => {
+        if (filteredProjects.length === 0) {
+            return;
+        }
 
-            filters.forEach(button => {
-                button.classList.remove("active");
+        currentIndex++;
+
+        if (currentIndex >= filteredProjects.length) {
+            currentIndex = 0;
+        }
+
+        renderProjects();
+
+    });
+
+
+    filterButtons.forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            filterButtons.forEach(item => {
+                item.classList.remove("active");
             });
 
-            filterButton.classList.add("active");
+            button.classList.add("active");
 
-            const filter =
-                filterButton.dataset.filter;
-
-            if (filter === "all") {
-
-                currentProjects = [...projects];
-
-            } else {
-
-                currentProjects =
-                    projects.filter(
-                        project =>
-                            project.filter === filter
-                    );
-
-            }
+            currentFilter =
+                button.dataset.filter;
 
             currentIndex = 0;
 
@@ -434,341 +357,111 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    if (previousButton) {
+    projectsStage.addEventListener("click", event => {
 
-        previousButton.addEventListener(
-            "click",
-            () => {
-                goToProject(currentIndex - 1);
-            }
-        );
+        const card =
+            event.target.closest(".project-card");
 
-    }
+        if (!card) {
+            return;
+        }
 
 
-    if (nextButton) {
-
-        nextButton.addEventListener(
-            "click",
-            () => {
-                goToProject(currentIndex + 1);
-            }
-        );
-
-    }
+        const link =
+            event.target.closest(".open-project");
 
 
-    if (dialogClose) {
-
-        dialogClose.addEventListener(
-            "click",
-            closeDialog
-        );
-
-    }
+        if (link) {
+            return;
+        }
 
 
-    if (dialog) {
-
-        dialog.addEventListener(
-            "click",
-            event => {
-
-                if (event.target === dialog) {
-                    closeDialog();
-                }
-
-            }
-        );
-
-    }
+        const project =
+            filteredProjects[
+            Number(card.dataset.index)
+            ];
 
 
-    document.addEventListener(
-        "keydown",
+        if (project) {
+            openProjectDialog(project);
+        }
+
+    });
+
+
+    dialogClose.addEventListener(
+        "click",
+        closeProjectDialog
+    );
+
+
+    projectDialog.addEventListener(
+        "click",
         event => {
 
-            if (event.key === "Escape" && dialog.open) {
-                closeDialog();
-            }
-
-            if (
-                event.key === "ArrowLeft" &&
-                !dialog.open
-            ) {
-                goToProject(currentIndex - 1);
-            }
-
-            if (
-                event.key === "ArrowRight" &&
-                !dialog.open
-            ) {
-                goToProject(currentIndex + 1);
+            if (event.target === projectDialog) {
+                closeProjectDialog();
             }
 
         }
     );
 
 
-    function setupTheme() {
+    document.addEventListener(
+        "keydown",
+        event => {
 
-        if (!themeToggle) {
-            return;
-        }
-
-        const savedTheme =
-            localStorage.getItem("portfolio-theme");
-
-        if (savedTheme === "light") {
-
-            document.body.classList.add("light");
-            document.documentElement.classList.add("light");
-
-        }
-
-        updateThemeIcon();
-
-
-        themeToggle.addEventListener(
-            "click",
-            () => {
-
-                const isLight =
-                    document.body.classList.toggle("light");
-
-                document.documentElement.classList.toggle(
-                    "light",
-                    isLight
-                );
-
-                localStorage.setItem(
-                    "portfolio-theme",
-                    isLight ? "light" : "dark"
-                );
-
-                updateThemeIcon();
-
+            if (event.key === "Escape") {
+                closeProjectDialog();
             }
-        );
 
-    }
-
-
-    function updateThemeIcon() {
-
-        if (!themeToggle) {
-            return;
         }
-
-        const isLight =
-            document.body.classList.contains("light");
-
-        themeToggle.innerHTML = `
-            <i data-lucide="${isLight ? "moon" : "sun"}"></i>
-        `;
-
-        themeToggle.setAttribute(
-            "aria-label",
-            isLight
-                ? "Cambiar a modo oscuro"
-                : "Cambiar a modo claro"
-        );
-
-        themeToggle.setAttribute(
-            "title",
-            isLight
-                ? "Modo oscuro"
-                : "Modo claro"
-        );
-
-        if (window.lucide) {
-            lucide.createIcons();
-        }
-
-    }
+    );
 
 
-    function setupMobileMenu() {
+    document.querySelectorAll(
+        'a[href^="#"]'
+    ).forEach(link => {
 
-        if (!menuToggle || !mainNav) {
-            return;
-        }
+        link.addEventListener("click", event => {
 
-        menuToggle.addEventListener(
-            "click",
-            () => {
+            const targetId =
+                link.getAttribute("href");
 
-                mainNav.classList.toggle("open");
-
-                const isOpen =
-                    mainNav.classList.contains("open");
-
-                menuToggle.innerHTML = `
-                    <i data-lucide="${isOpen ? "x" : "menu"}"></i>
-                `;
-
-                if (window.lucide) {
-                    lucide.createIcons();
-                }
-
+            if (
+                !targetId ||
+                targetId === "#"
+            ) {
+                return;
             }
-        );
 
 
-        mainNav.querySelectorAll("a").forEach(link => {
+            const target =
+                document.querySelector(targetId);
 
-            link.addEventListener(
-                "click",
-                () => {
 
-                    mainNav.classList.remove("open");
+            if (!target) {
+                return;
+            }
 
-                    menuToggle.innerHTML = `
-                        <i data-lucide="menu"></i>
-                    `;
 
-                    if (window.lucide) {
-                        lucide.createIcons();
-                    }
+            event.preventDefault();
 
-                }
-            );
+
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
 
         });
 
-    }
+    });
 
 
-    function setupNavigationObserver() {
-
-        const sections =
-            document.querySelectorAll("main section[id]");
-
-        const navLinks =
-            document.querySelectorAll(".nav-links a");
-
-        const observer =
-            new IntersectionObserver(
-                entries => {
-
-                    entries.forEach(entry => {
-
-                        if (!entry.isIntersecting) {
-                            return;
-                        }
-
-                        navLinks.forEach(link => {
-                            link.classList.remove("active");
-                        });
-
-                        const activeLink =
-                            document.querySelector(
-                                `.nav-links a[href="#${entry.target.id}"]`
-                            );
-
-                        if (activeLink) {
-                            activeLink.classList.add("active");
-                        }
-
-                    });
-
-                },
-                {
-                    rootMargin: "-35% 0px -55% 0px"
-                }
-            );
-
-        sections.forEach(section => {
-            observer.observe(section);
-        });
-
-    }
-
-
-    function setupRevealAnimations() {
-
-        const elements =
-            document.querySelectorAll(".reveal");
-
-        const observer =
-            new IntersectionObserver(
-                entries => {
-
-                    entries.forEach(entry => {
-
-                        if (
-                            entry.isIntersecting
-                        ) {
-
-                            entry.target.classList.add(
-                                "visible"
-                            );
-
-                            observer.unobserve(
-                                entry.target
-                            );
-
-                        }
-
-                    });
-
-                },
-                {
-                    threshold: .12
-                }
-            );
-
-        elements.forEach(element => {
-            observer.observe(element);
-        });
-
-    }
-
-
-    function setupCursorGlow() {
-
-        const glow =
-            document.querySelector(".cursor-glow");
-
-        if (!glow) {
-            return;
-        }
-
-        if (
-            window.matchMedia(
-                "(pointer: coarse)"
-            ).matches
-        ) {
-            glow.style.display = "none";
-            return;
-        }
-
-        window.addEventListener(
-            "pointermove",
-            event => {
-
-                glow.style.left =
-                    `${event.clientX}px`;
-
-                glow.style.top =
-                    `${event.clientY}px`;
-
-            }
-        );
-
-    }
-
-
-    setupTheme();
-    setupMobileMenu();
-    setupNavigationObserver();
-    setupRevealAnimations();
-    setupCursorGlow();
+    loadTheme();
 
     renderProjects();
 
-    if (window.lucide) {
-        lucide.createIcons();
-    }
+    initializeIcons();
 
 });
